@@ -6,7 +6,7 @@
 // export const stkPushQuery= async (reqId: string) => {
 //   try {
 //     //generate token
-//     const auth: string = Buffer.from(
+//     const auth: string =  Buffer.from(
 //       `${process.env.MPESA_CONSUMER_KEY}:${process.env.MPESA_CONSUMER_SECRET}`
 //     ).toString("base64");
 
