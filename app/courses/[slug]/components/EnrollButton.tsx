@@ -50,7 +50,7 @@ export function EnrollButton({ courseSlug, price, currency, isLoggedIn }: Enroll
   return (
     <>
       <Button 
-        className="w-full" 
+        className="w-full sm:w-auto min-w-[200px]" 
         size="lg"
         onClick={handleEnrollClick}
       >

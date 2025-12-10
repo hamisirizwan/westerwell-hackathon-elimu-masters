@@ -73,10 +73,21 @@ export default async function CourseDetailsPage({ params }: Props) {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="bg-muted/50 border-b">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-          <div className="grid lg:grid-cols-3 gap-8">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <div className="space-y-8">
+            {/* Course Thumbnail */}
+            {course.thumbnail && (
+              <div className="relative w-full aspect-video overflow-hidden rounded-lg bg-muted">
+                <img
+                  src={course.thumbnail}
+                  alt={course.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
             {/* Course Info */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="space-y-6">
               <div className="flex flex-wrap gap-2">
                 {course.category && (
                   <Badge variant="secondary">{course.category}</Badge>
@@ -136,172 +147,153 @@ export default async function CourseDetailsPage({ params }: Props) {
                   Instructor: <span className="font-medium">{course.instructor.username}</span>
                 </p>
               )}
-            </div>
 
-            {/* Enrollment Card */}
-            <div className="lg:col-span-1">
-              <Card className="sticky top-6">
-                {course.thumbnail && (
-                  <div className="relative w-full aspect-video overflow-hidden rounded-t-lg">
-                    <img
-                      src={course.thumbnail}
-                      alt={course.title}
-                      className="w-full h-full object-cover"
-                    />
+              {/* What you'll learn */}
+              {course.learningOutcomes.length > 0 && (
+                <section className="pt-4">
+                  <h2 className="text-xl font-bold mb-4">What you&apos;ll learn</h2>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {course.learningOutcomes.map((outcome, index) => (
+                      <div key={index} className="flex gap-3">
+                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                        <span className="text-sm">{outcome}</span>
+                      </div>
+                    ))}
                   </div>
-                )}
-                <CardContent className="p-6 space-y-6">
-                  <div className="text-3xl font-bold">
-                    {formatPrice(course.price, course.currency)}
-                  </div>
-
-                  {course.courseType === 'live' && course.startDate && (
-                    <div className="text-sm text-muted-foreground">
-                      <p>Starts: {formatDate(course.startDate)}</p>
-                      {course.endDate && <p>Ends: {formatDate(course.endDate)}</p>}
-                      {course.maxStudents && (
-                        <p className="mt-2">
-                          {course.maxStudents - course.enrollmentCount} spots left
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  <EnrollButton 
-                    courseSlug={course.slug}
-                    price={course.price}
-                    currency={course.currency}
-                    isLoggedIn={isLoggedIn}
-                  />
-
-                  <div className="text-sm text-muted-foreground space-y-2">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <span>Full lifetime access</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <span>Certificate of completion</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                </section>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Course Content */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2 space-y-12">
-            {/* What you'll learn */}
-            {course.learningOutcomes.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-bold mb-6">What you&apos;ll learn</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {course.learningOutcomes.map((outcome, index) => (
-                    <div key={index} className="flex gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                      <span>{outcome}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12 pb-24">
+        <div className="space-y-12">
+          {/* Requirements */}
+          {course.requirements.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-bold mb-6">Requirements</h2>
+              <ul className="space-y-2">
+                {course.requirements.map((req, index) => (
+                  <li key={index} className="flex gap-3">
+                    <span className="text-muted-foreground">•</span>
+                    <span>{req}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-            {/* Requirements */}
-            {course.requirements.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-bold mb-6">Requirements</h2>
-                <ul className="space-y-2">
-                  {course.requirements.map((req, index) => (
-                    <li key={index} className="flex gap-3">
-                      <span className="text-muted-foreground">•</span>
-                      <span>{req}</span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {/* Course Curriculum (Self-paced) */}
-            {course.courseType === 'self-paced' && course.modules.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-bold mb-6">Course Curriculum</h2>
-                <div className="space-y-4">
-                  {course.modules.map((module) => (
-                    <Card key={module.id}>
-                      <CardHeader className="py-4">
-                        <CardTitle className="text-base flex items-center justify-between">
-                          <span>{module.title}</span>
-                          <span className="text-sm font-normal text-muted-foreground">
-                            {module.lessons.length} lessons
-                          </span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-0 pb-4">
-                        <ul className="space-y-2">
-                          {module.lessons.map((lesson) => (
-                            <li 
-                              key={lesson.id} 
-                              className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-muted/50"
-                            >
-                              <div className="flex items-center gap-3">
-                                <PlayCircle className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm">{lesson.title}</span>
-                                {lesson.isFreePreview && (
-                                  <Badge variant="secondary" className="text-xs">Preview</Badge>
-                                )}
-                              </div>
-                              {lesson.duration && (
-                                <span className="text-sm text-muted-foreground">
-                                  {formatDuration(lesson.duration)}
-                                </span>
+          {/* Course Curriculum (Self-paced) */}
+          {course.courseType === 'self-paced' && course.modules.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-bold mb-6">Course Curriculum</h2>
+              <div className="space-y-4">
+                {course.modules.map((module) => (
+                  <Card key={module.id}>
+                    <CardHeader className="py-4">
+                      <CardTitle className="text-base flex items-center justify-between">
+                        <span>{module.title}</span>
+                        <span className="text-sm font-normal text-muted-foreground">
+                          {module.lessons.length} lessons
+                        </span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0 pb-4">
+                      <ul className="space-y-2">
+                        {module.lessons.map((lesson) => (
+                          <li 
+                            key={lesson.id} 
+                            className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-muted/50"
+                          >
+                            <div className="flex items-center gap-3">
+                              <PlayCircle className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm">{lesson.title}</span>
+                              {lesson.isFreePreview && (
+                                <Badge variant="secondary" className="text-xs">Preview</Badge>
                               )}
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </section>
-            )}
+                            </div>
+                            {lesson.duration && (
+                              <span className="text-sm text-muted-foreground">
+                                {formatDuration(lesson.duration)}
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
 
-            {/* Schedule (Live courses) */}
-            {course.courseType === 'live' && course.sessions.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-bold mb-6">Course Schedule</h2>
-                <div className="space-y-3">
-                  {course.sessions.map((session) => (
-                    <Card key={session.id}>
-                      <CardContent className="py-4 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Video className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{session.title}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {formatDate(session.scheduledAt)}
-                            </p>
-                          </div>
+          {/* Schedule (Live courses) */}
+          {course.courseType === 'live' && course.sessions.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-bold mb-6">Course Schedule</h2>
+              <div className="space-y-3">
+                {course.sessions.map((session) => (
+                  <Card key={session.id}>
+                    <CardContent className="py-4 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Video className="h-5 w-5 text-primary" />
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          {formatDuration(session.duration)}
+                        <div>
+                          <p className="font-medium">{session.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {formatDate(session.scheduledAt)}
+                          </p>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </section>
-            )}
-          </div>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {formatDuration(session.duration)}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
 
-          {/* Sidebar - hidden on mobile, shown on lg */}
-          <div className="hidden lg:block">
-            {/* Can add additional sidebar content here */}
+      {/* Floating Sticky Enroll Button */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="hidden sm:flex items-center gap-6">
+              <div>
+                <div className="text-2xl font-bold">
+                  {formatPrice(course.price, course.currency)}
+                </div>
+                {course.courseType === 'live' && course.startDate && (
+                  <div className="text-xs text-muted-foreground">
+                    Starts {formatDate(course.startDate)}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span>Lifetime access</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span>Certificate</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 sm:flex-none">
+              <EnrollButton 
+                courseSlug={course.slug}
+                price={course.price}
+                currency={course.currency}
+                isLoggedIn={isLoggedIn}
+              />
+            </div>
           </div>
         </div>
       </div>
