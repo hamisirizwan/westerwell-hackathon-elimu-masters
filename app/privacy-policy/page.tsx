@@ -1,9 +1,13 @@
 import { HeroHeader } from "@/components/header"
+import { auth } from "@/lib/auth/auth"
 
-function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const session = await auth()
+  
   return (
-   <div>Privacy Policy</div>
+    <>
+      <HeroHeader isLoggedIn={!!session?.user} />
+      <div>Privacy Policy</div>
+    </>
   )
 }
-
-export default PrivacyPolicyPage

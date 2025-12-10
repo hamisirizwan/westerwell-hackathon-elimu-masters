@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { TextEffect } from '@/components/ui/text-effect'
 import { AnimatedGroup } from '@/components/ui/animated-group'
-import { HeroHeader } from './header'
 
 const transitionVariants = {
     item: {
@@ -29,9 +28,7 @@ const transitionVariants = {
 
 export default function HeroSection() {
     return (
-        <>
-            <HeroHeader />
-            <main className="overflow-hidden">
+        <main className="overflow-hidden">
                 <div
                     aria-hidden
                     className="absolute inset-0 isolate hidden opacity-65 contain-strict lg:block">
@@ -50,9 +47,9 @@ export default function HeroSection() {
                             <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
                                 <AnimatedGroup >
                                     <Link
-                                        href="#link"
+                                        href="/explore"
                                         className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 dark:border-t-white/5 dark:shadow-zinc-950">
-                                        <span className="text-foreground text-sm">Introducing ElimuMaster Lms</span>
+                                        <span className="text-foreground text-sm">Learn from Africa&apos;s Best Instructors</span>
                                         <span className="dark:border-background block h-4 w-0.5 border-l bg-white dark:bg-zinc-700"></span>
 
                                         <div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
@@ -73,7 +70,7 @@ export default function HeroSection() {
                                     speedSegment={0.3}
                                     as="h1"
                                     className="mx-auto mt-8 max-w-4xl text-balance text-5xl max-md:font-semibold md:text-7xl lg:mt-16 xl:text-[5.25rem]">
-                                    Get Paid Faster with Payment Links
+                                    Learn Skills That Transform Your Future
                                 </TextEffect>
                                 <TextEffect
                                     per="line"
@@ -82,11 +79,10 @@ export default function HeroSection() {
                                     delay={0.5}
                                     as="p"
                                     className="mx-auto mt-8 max-w-2xl text-balance text-lg">
-                                    Create shareable payment links in seconds. No website needed. Just share, collect payments via M-Pesa, and watch your business grow.
+                                    Join thousands of students across Africa learning from expert instructors. Choose from self-paced video courses or join live interactive sessions. Start your learning journey today.
                                 </TextEffect>
 
-                                {/* <AnimatedGroup
-                                    
+                                <AnimatedGroup
                                     className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
                                     <div
                                         key={1}
@@ -95,8 +91,8 @@ export default function HeroSection() {
                                             asChild
                                             size="lg"
                                             className="rounded-xl px-5 text-base">
-                                            <Link href="#link">
-                                                <span className="text-nowrap">Start Building</span>
+                                            <Link href="/explore">
+                                                <span className="text-nowrap">Explore Courses</span>
                                             </Link>
                                         </Button>
                                     </div>
@@ -106,16 +102,15 @@ export default function HeroSection() {
                                         size="lg"
                                         variant="ghost"
                                         className="h-10.5 rounded-xl px-5">
-                                        <Link href="#link">
-                                            <span className="text-nowrap">Request a demo</span>
+                                        <Link href="/register">
+                                            <span className="text-nowrap">Get Started Free</span>
                                         </Link>
                                     </Button>
-                                </AnimatedGroup> */}
+                                </AnimatedGroup>
                             </div>
                         </div>
                     </div>
                 </section>
             </main>
-        </>
     )
 }

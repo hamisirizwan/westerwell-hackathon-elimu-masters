@@ -1,0 +1,311 @@
+import { getCourseBySlug } from "@/actions/courses/getCourseBySlug"
+import { notFound } from "next/navigation"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { 
+  Clock, 
+  BookOpen, 
+  Users, 
+  Globe, 
+  CheckCircle2,
+  PlayCircle,
+  Video,
+  Calendar,
+} from "lucide-react"
+import { Metadata } from "next"
+import { auth } from "@/lib/auth/auth"
+import { EnrollButton } from "./components/EnrollButton"
+
+type Props = {
+  params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const result = await getCourseBySlug(slug)
+
+  if (!result.success || !result.data) {
+    return {
+      title: 'Course Not Found',
+    }
+  }
+
+  return {
+    title: result.data.title,
+    description: result.data.description || `Learn ${result.data.title} on Elimu Masters`,
+  }
+}
+
+export default async function CourseDetailsPage({ params }: Props) {
+  const { slug } = await params
+  const session = await auth()
+  const result = await getCourseBySlug(slug)
+
+  if (!result.success || !result.data) {
+    notFound()
+  }
+
+  const course = result.data
+  const isLoggedIn = !!session?.user
+
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) return `${minutes} min`
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
+  }
+
+  const formatPrice = (price: number, currency: string) => {
+    if (price === 0) return 'Free'
+    return `${currency} ${price.toLocaleString()}`
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <div className="bg-muted/50 border-b">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Course Info */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="flex flex-wrap gap-2">
+                {course.category && (
+                  <Badge variant="secondary">{course.category}</Badge>
+                )}
+                <Badge variant="outline" className="capitalize">{course.level}</Badge>
+                <Badge variant="outline">
+                  {course.courseType === 'live' ? (
+                    <><Video className="h-3 w-3 mr-1" /> Live Course</>
+                  ) : (
+                    <><PlayCircle className="h-3 w-3 mr-1" /> Self-paced</>
+                  )}
+                </Badge>
+              </div>
+
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">
+                {course.title}
+              </h1>
+
+              {course.description && (
+                <p className="text-lg text-muted-foreground">
+                  {course.description}
+                </p>
+              )}
+
+              {/* Quick Stats */}
+              <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
+                {course.totalDuration > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span>{formatDuration(course.totalDuration)}</span>
+                  </div>
+                )}
+                {course.courseType === 'self-paced' && course.totalLessons > 0 && (
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    <span>{course.totalLessons} lessons</span>
+                  </div>
+                )}
+                {course.courseType === 'live' && course.totalSessions > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span>{course.totalSessions} sessions</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  <span>{course.language}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  <span>{course.enrollmentCount} enrolled</span>
+                </div>
+              </div>
+
+              {course.instructor && (
+                <p className="text-sm">
+                  Instructor: <span className="font-medium">{course.instructor.username}</span>
+                </p>
+              )}
+            </div>
+
+            {/* Enrollment Card */}
+            <div className="lg:col-span-1">
+              <Card className="sticky top-6">
+                {course.thumbnail && (
+                  <div className="relative w-full aspect-video overflow-hidden rounded-t-lg">
+                    <img
+                      src={course.thumbnail}
+                      alt={course.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <CardContent className="p-6 space-y-6">
+                  <div className="text-3xl font-bold">
+                    {formatPrice(course.price, course.currency)}
+                  </div>
+
+                  {course.courseType === 'live' && course.startDate && (
+                    <div className="text-sm text-muted-foreground">
+                      <p>Starts: {formatDate(course.startDate)}</p>
+                      {course.endDate && <p>Ends: {formatDate(course.endDate)}</p>}
+                      {course.maxStudents && (
+                        <p className="mt-2">
+                          {course.maxStudents - course.enrollmentCount} spots left
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  <EnrollButton 
+                    courseSlug={course.slug}
+                    price={course.price}
+                    currency={course.currency}
+                    isLoggedIn={isLoggedIn}
+                  />
+
+                  <div className="text-sm text-muted-foreground space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <span>Full lifetime access</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <span>Certificate of completion</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Course Content */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2 space-y-12">
+            {/* What you'll learn */}
+            {course.learningOutcomes.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold mb-6">What you&apos;ll learn</h2>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {course.learningOutcomes.map((outcome, index) => (
+                    <div key={index} className="flex gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                      <span>{outcome}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Requirements */}
+            {course.requirements.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold mb-6">Requirements</h2>
+                <ul className="space-y-2">
+                  {course.requirements.map((req, index) => (
+                    <li key={index} className="flex gap-3">
+                      <span className="text-muted-foreground">•</span>
+                      <span>{req}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {/* Course Curriculum (Self-paced) */}
+            {course.courseType === 'self-paced' && course.modules.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold mb-6">Course Curriculum</h2>
+                <div className="space-y-4">
+                  {course.modules.map((module) => (
+                    <Card key={module.id}>
+                      <CardHeader className="py-4">
+                        <CardTitle className="text-base flex items-center justify-between">
+                          <span>{module.title}</span>
+                          <span className="text-sm font-normal text-muted-foreground">
+                            {module.lessons.length} lessons
+                          </span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0 pb-4">
+                        <ul className="space-y-2">
+                          {module.lessons.map((lesson) => (
+                            <li 
+                              key={lesson.id} 
+                              className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-muted/50"
+                            >
+                              <div className="flex items-center gap-3">
+                                <PlayCircle className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm">{lesson.title}</span>
+                                {lesson.isFreePreview && (
+                                  <Badge variant="secondary" className="text-xs">Preview</Badge>
+                                )}
+                              </div>
+                              {lesson.duration && (
+                                <span className="text-sm text-muted-foreground">
+                                  {formatDuration(lesson.duration)}
+                                </span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Schedule (Live courses) */}
+            {course.courseType === 'live' && course.sessions.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold mb-6">Course Schedule</h2>
+                <div className="space-y-3">
+                  {course.sessions.map((session) => (
+                    <Card key={session.id}>
+                      <CardContent className="py-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Video className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{session.title}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {formatDate(session.scheduledAt)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {formatDuration(session.duration)}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+
+          {/* Sidebar - hidden on mobile, shown on lg */}
+          <div className="hidden lg:block">
+            {/* Can add additional sidebar content here */}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+

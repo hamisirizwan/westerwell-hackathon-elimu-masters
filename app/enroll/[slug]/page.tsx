@@ -1,52 +1,48 @@
 import { notFound } from 'next/navigation'
 import { auth } from '@/lib/auth/auth'
-import dbConnect from '@/db/dbConnect'
-import { Course } from '@/db/models/CourseModel'
+import { getCourseBySlug } from '@/actions/courses/getCourseBySlug'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Metadata } from 'next'
 
-interface EnrollPageProps {
-  params: Promise<{
-    courseId: string
-  }>
+type Props = {
+  params: Promise<{ slug: string }>
 }
 
-export async function generateMetadata({ params }: EnrollPageProps) {
-  const { courseId } = await params
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const result = await getCourseBySlug(slug)
 
-  try {
-    await dbConnect()
-    const course = await Course.findById(courseId)
+  if (!result.success || !result.data) {
+    return { title: 'Course not found' }
+  }
 
-    if (!course) {
-      return { title: 'Course not found' }
-    }
-
-    return {
-      title: `Enroll: ${course.title}`,
-      description: `Enroll in ${course.title}`,
-    }
-  } catch {
-    return { title: 'Enrollment' }
+  return {
+    title: `Enroll: ${result.data.title}`,
+    description: `Enroll in ${result.data.title}`,
   }
 }
 
-export default async function EnrollPage({ params }: EnrollPageProps) {
+export default async function EnrollPage({ params }: Props) {
   const session = await auth()
 
   if (!session?.user?.id) {
     notFound()
   }
 
-  const { courseId } = await params
+  const { slug } = await params
+  const result = await getCourseBySlug(slug)
 
-  await dbConnect()
-
-  const course = await Course.findById(courseId)
-
-  if (!course) {
+  if (!result.success || !result.data) {
     notFound()
+  }
+
+  const course = result.data
+
+  const formatPrice = (price: number, currency: string) => {
+    if (price === 0) return 'Free'
+    return `${currency} ${price.toLocaleString()}`
   }
 
   return (
@@ -74,10 +70,7 @@ export default async function EnrollPage({ params }: EnrollPageProps) {
               <div>
                 <p className="text-sm text-muted-foreground">Price</p>
                 <p className="text-2xl font-bold">
-                  {course.price}
-                  <span className="text-sm text-muted-foreground ml-1">
-                    {course.currency}
-                  </span>
+                  {formatPrice(course.price, course.currency)}
                 </p>
               </div>
             </CardContent>
@@ -92,7 +85,7 @@ export default async function EnrollPage({ params }: EnrollPageProps) {
           </Card>
 
           <div className="flex gap-4">
-            <Link href={`/courses/${courseId}`} className="flex-1">
+            <Link href={`/courses/${course.slug}`} className="flex-1">
               <Button variant="outline" size="lg" className="w-full">
                 Back to Course
               </Button>
@@ -108,3 +101,4 @@ export default async function EnrollPage({ params }: EnrollPageProps) {
     </div>
   )
 }
+

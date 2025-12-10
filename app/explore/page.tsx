@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { HeroHeader } from '@/components/header'
+import { auth } from '@/lib/auth/auth'
 
 export const metadata = {
   title: 'Explore Courses',
@@ -12,14 +14,17 @@ export const metadata = {
 
 export default async function ExplorePage() {
   await dbConnect()
+  const session = await auth()
 
   const courses = await Course.find({ status: 'published' })
-    .select('_id title description thumbnail price currency level category')
+    .select('_id title slug description thumbnail price currency level category courseType')
     .sort({ createdAt: -1 })
     .lean()
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+    <>
+      <HeroHeader isLoggedIn={!!session?.user} />
+      <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8 pt-24">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-12 text-center sm:text-left">
@@ -82,7 +87,7 @@ export default async function ExplorePage() {
                   </div>
 
                   <Link 
-                    href={`/courses/${course._id.toString()}`}
+                    href={`/courses/${course.slug}`}
                     className="w-full"
                   >
                     <Button className="w-full">View Course</Button>
@@ -102,5 +107,6 @@ export default async function ExplorePage() {
         )}
       </div>
     </div>
+    </>
   )
 }

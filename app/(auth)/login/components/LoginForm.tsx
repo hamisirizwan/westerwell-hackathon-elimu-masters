@@ -44,6 +44,11 @@ export function LoginForm() {
   async function onSubmit(data: FormValues) {
     setIsLoading(true)
 
+    // Check if there's a course to enroll in before login
+    const enrollAfterLogin = typeof window !== 'undefined' 
+      ? localStorage.getItem('enrollAfterLogin')
+      : null
+
     const formData = new FormData()
     formData.append('email', data.email)
     formData.append('password', data.password)
@@ -55,14 +60,15 @@ export function LoginForm() {
     if (result?.success) {
       toast.success(result.success)
       
-      // Check if there's a course to enroll in
-      const enrollAfterLogin = localStorage.getItem('enrollAfterLogin')
-      if (enrollAfterLogin) {
-        localStorage.removeItem('enrollAfterLogin')
-        router.push(`/enroll/${enrollAfterLogin}`)
-      } else {
-        router.push('/dashboard')
-      }
+      // Small delay to ensure session is set
+      setTimeout(() => {
+        if (enrollAfterLogin) {
+          localStorage.removeItem('enrollAfterLogin')
+          router.push(`/enroll/${enrollAfterLogin}`)
+        } else {
+          router.push('/dashboard')
+        }
+      }, 100)
     } else if (result?.error) {
       toast.error(result.error)
     }

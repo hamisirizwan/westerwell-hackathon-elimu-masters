@@ -41,7 +41,7 @@ export async function login(prevState: unknown, formData: FormData) {
     await signIn('credentials', {
       email,
       password,
-      redirectTo: '/dashboard',
+      redirect: false,
     })
 
     return { success: "Logged in successfully" }
