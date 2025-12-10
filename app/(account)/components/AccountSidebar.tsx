@@ -29,7 +29,8 @@ import { LogoutButton } from "@/components/LogoutButton"
 
 const mainItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  { icon: BookOpen, label: "My Courses", href: "/courses" },
+  { icon: BookOpen, label: "My Courses", href: "/my-courses" },
+  { icon: GraduationCap, label: "Courses", href: "/courses" },
 ]
 
 const adminItems = [
@@ -51,8 +52,11 @@ export function AccountSidebar({ isAdmin }: AccountSidebarProps) {
   const pathname = usePathname()
 
   const isActiveLink = (href: string) => {
-    if (href === '/courses') {
-      return pathname === '/courses' || (pathname.startsWith('/courses/') && !pathname.includes('/admin'))
+    if (href === '/account/courses') {
+      return pathname === '/account/courses' || (pathname.startsWith('/account/courses/') && !pathname.includes('/admin'))
+    }
+    if (href === '/my-courses') {
+      return pathname === '/account/my-courses' || pathname.startsWith('/account/my-courses/')
     }
     if (href === '/admin/courses') {
       return pathname === '/admin/courses' || (pathname.startsWith('/admin/courses/') && !pathname.includes('/create'))

@@ -54,7 +54,15 @@ export function LoginForm() {
 
     if (result?.success) {
       toast.success(result.success)
-      router.push('/dashboard')
+      
+      // Check if there's a course to enroll in
+      const enrollAfterLogin = localStorage.getItem('enrollAfterLogin')
+      if (enrollAfterLogin) {
+        localStorage.removeItem('enrollAfterLogin')
+        router.push(`/enroll/${enrollAfterLogin}`)
+      } else {
+        router.push('/dashboard')
+      }
     } else if (result?.error) {
       toast.error(result.error)
     }

@@ -75,7 +75,7 @@ export default async function DashboardPage() {
             You haven&apos;t enrolled in any courses yet. Start your learning journey today!
           </p>
           <Button asChild>
-            <Link href="/explore">Browse Courses</Link>
+            <Link href="/courses">Browse Courses</Link>
           </Button>
         </div>
       </div>
