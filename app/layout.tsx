@@ -17,8 +17,9 @@ const geistSans = { variable: "font-sans" };
 const geistMono = { variable: "font-mono" };
 
 export const metadata: Metadata = {
-  title: "Links",
-  description: "Payment Links Application",
+  title: "Afrimote - Simple Payment & Management for LMS SaaS Providers",
+  description:
+    "A modern LMS SaaS platform offering a simplified payment process and seamless subscription management for course providers and educators.",
 };
 
 export default function RootLayout({
