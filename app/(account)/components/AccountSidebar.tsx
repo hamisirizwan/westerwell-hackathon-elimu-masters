@@ -10,7 +10,9 @@ import {
   BookOpen, 
   PlusCircle,
   Users,
-  ShieldCheck
+  ShieldCheck,
+  Wallet,
+  CreditCard
 } from "lucide-react"
 import {
   Sidebar,
@@ -31,12 +33,14 @@ const mainItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: BookOpen, label: "My Courses", href: "/my-courses" },
   { icon: GraduationCap, label: "Courses", href: "/courses" },
+  { icon: Wallet, label: "Finance", href: "/finance" },
 ]
 
 const adminItems = [
   { icon: PlusCircle, label: "Create Course", href: "/admin/courses/create" },
   { icon: BookOpen, label: "Manage Courses", href: "/admin/courses" },
   { icon: Users, label: "Students", href: "/admin/students" },
+  { icon: CreditCard, label: "Payments", href: "/admin/payments" },
 ]
 
 const accountItems = [
