@@ -82,6 +82,17 @@ export default function HeroSection() {
                                     Join thousands of students across Africa learning from expert instructors. Choose from self-paced video courses or join live interactive sessions. Start your learning journey today.
                                 </TextEffect>
 
+                                <div className="mt-8 flex justify-center">
+                                    <Image
+                                        src="/flags.png"
+                                        alt="Flags representing supported African currencies"
+                                        width={960}
+                                        height={180}
+                                        className="h-auto w-full max-w-4xl"
+                                        priority
+                                    />
+                                </div>
+
                                 <AnimatedGroup
                                     className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
                                     <div

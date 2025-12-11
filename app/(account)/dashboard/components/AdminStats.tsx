@@ -153,7 +153,7 @@ export function AdminStats({ stats }: AdminStatsProps) {
                 <Line 
                   type="monotone" 
                   dataKey="amount" 
-                  stroke="#8884d8" 
+                  stroke="var(--chart-1)" 
                   strokeWidth={2}
                   name="Payment Amount"
                   dot={{ r: 4 }}
@@ -181,7 +181,7 @@ export function AdminStats({ stats }: AdminStatsProps) {
                 />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip />
-                <Bar dataKey="count" fill="#8884d8" name="Enrollments" />
+                <Bar dataKey="count" fill="var(--chart-2)" name="Enrollments" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

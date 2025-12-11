@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { SendFlowLogoText } from '@/components/sendflow-logo'
+import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -38,7 +38,14 @@ export const HeroHeader = ({ isLoggedIn = false }: HeroHeaderProps) => {
                                 href="/"
                                 aria-label="home"
                                 className="flex items-center space-x-2">
-                                <SendFlowLogoText />
+                                <Image
+                                    src="/afrimote_logo.png"
+                                    alt="Afrimote logo"
+                                    width={180}
+                                    height={48}
+                                    priority
+                                    className="h-10 w-auto"
+                                />
                             </Link>
 
                             <button
