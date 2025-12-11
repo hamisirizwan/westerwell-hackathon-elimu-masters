@@ -141,7 +141,7 @@ export default async function MyCoursesPage() {
 
                   {enrollment.enrollmentStatus === EnrollmentStatus.ACTIVE ? (
                     <Link
-                      href={`/courses/${course.slug}`}
+                      href={`/learn/${course.slug}`}
                       className="w-full"
                     >
                       <Button className="w-full">Continue Learning</Button>

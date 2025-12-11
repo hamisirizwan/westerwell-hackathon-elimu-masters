@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MoreHorizontal, Pencil, Trash2, Eye, Video, Users } from "lucide-react"
+import { MoreHorizontal, Pencil, Trash2, Eye, Video, Users, BookOpen } from "lucide-react"
 import { toast } from 'sonner'
 import { deleteCourse } from '@/actions/courses/deleteCourse'
 
@@ -174,6 +174,12 @@ export function CoursesTable({ courses }: CoursesTableProps) {
                         <Link href={`/admin/courses/${course.id}/edit`}>
                           <Pencil className="h-4 w-4 mr-2" />
                           Edit
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/admin/courses/${course.id}/content`}>
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          Manage Content
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
