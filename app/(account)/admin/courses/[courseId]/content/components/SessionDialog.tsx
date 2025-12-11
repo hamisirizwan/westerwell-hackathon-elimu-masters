@@ -32,12 +32,19 @@ const sessionSchema = z.object({
   title: z.string().min(1, 'Title is required').max(150, 'Title cannot exceed 150 characters'),
   description: z.string().max(1000, 'Description cannot exceed 1000 characters').optional(),
   scheduledAt: z.string().min(1, 'Scheduled date/time is required'),
-  duration: z.string().min(1, 'Duration is required').transform((val) => parseFloat(val)),
+  duration: z.union([z.string(), z.number()]).transform((val) => {
+    if (typeof val === 'string') {
+      const num = parseFloat(val)
+      return isNaN(num) ? 1 : num
+    }
+    return val
+  }).pipe(z.number().min(1, 'Duration must be at least 1 minute')),
   meetingLink: z.string().url('Invalid meeting link').optional().or(z.literal('')),
   recordingUrl: z.string().url('Invalid recording URL').optional().or(z.literal('')),
 })
 
-type SessionFormValues = z.infer<typeof sessionSchema>
+type SessionFormValues = z.input<typeof sessionSchema>
+type SessionFormOutput = z.infer<typeof sessionSchema>
 
 interface SessionDialogProps {
   open: boolean
@@ -55,7 +62,7 @@ export function SessionDialog({ open, onOpenChange, onSubmit, session, courseId 
       title: '',
       description: '',
       scheduledAt: '',
-      duration: 60,
+      duration: '60',
       meetingLink: '',
       recordingUrl: '',
     },
@@ -82,7 +89,7 @@ export function SessionDialog({ open, onOpenChange, onSubmit, session, courseId 
         title: '',
         description: '',
         scheduledAt: '',
-        duration: 60,
+        duration: '60',
         meetingLink: '',
         recordingUrl: '',
       })
@@ -90,13 +97,15 @@ export function SessionDialog({ open, onOpenChange, onSubmit, session, courseId 
   }, [session, form, open])
 
   const handleSubmit = async (data: SessionFormValues) => {
+    // zodResolver transforms the data, so it's the output type
+    const validatedData = data as unknown as SessionFormOutput
     // Convert local datetime to ISO string
-    const scheduledAt = new Date(data.scheduledAt).toISOString()
+    const scheduledAt = new Date(validatedData.scheduledAt).toISOString()
 
     if (session) {
       // Update existing session
       const result = await updateSession(session.id, {
-        ...data,
+        ...validatedData,
         scheduledAt,
       })
       if (result.success) {
@@ -109,7 +118,7 @@ export function SessionDialog({ open, onOpenChange, onSubmit, session, courseId 
     } else {
       // Create new session
       onSubmit({
-        ...data,
+        ...validatedData,
         scheduledAt,
       })
       onOpenChange(false)
@@ -180,8 +189,14 @@ export function SessionDialog({ open, onOpenChange, onSubmit, session, courseId 
                       <Input
                         type="number"
                         min="1"
-                        {...field}
-                        onChange={(e) => field.onChange(e.target.value)}
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          field.onChange(value === '' ? undefined : value)
+                        }}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                        ref={field.ref}
                       />
                     </FormControl>
                     <FormMessage />

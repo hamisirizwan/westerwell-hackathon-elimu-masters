@@ -153,7 +153,7 @@ export default async function CourseDetailsPage({ params }: Props) {
                 <section className="pt-4">
                   <h2 className="text-xl font-bold mb-4">What you&apos;ll learn</h2>
                   <div className="grid sm:grid-cols-2 gap-3">
-                    {course.learningOutcomes.map((outcome, index) => (
+                    {course.learningOutcomes.map((outcome: string, index: number) => (
                       <div key={index} className="flex gap-3">
                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
                         <span className="text-sm">{outcome}</span>

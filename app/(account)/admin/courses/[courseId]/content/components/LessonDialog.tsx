@@ -33,11 +33,16 @@ const lessonSchema = z.object({
   title: z.string().min(1, 'Title is required').max(150, 'Title cannot exceed 150 characters'),
   description: z.string().max(1000, 'Description cannot exceed 1000 characters').optional(),
   videoUrl: z.string().url('Invalid video URL').min(1, 'Video URL is required'),
-  duration: z.string().optional().transform((val) => val ? parseFloat(val) : undefined),
-  isFreePreview: z.boolean().default(false),
+  duration: z.union([z.string(), z.number()]).optional().transform((val) => {
+    if (val === undefined || val === null || val === '') return undefined
+    const num = typeof val === 'string' ? parseFloat(val) : val
+    return isNaN(num) ? undefined : num
+  }).pipe(z.number().min(0, 'Duration cannot be negative').optional()),
+  isFreePreview: z.boolean().optional().default(false),
 })
 
-type LessonFormValues = z.infer<typeof lessonSchema>
+type LessonFormValues = z.input<typeof lessonSchema>
+type LessonFormOutput = z.infer<typeof lessonSchema>
 
 interface LessonDialogProps {
   open: boolean
@@ -66,7 +71,7 @@ export function LessonDialog({ open, onOpenChange, onSubmit, lesson, moduleId }:
         title: lesson.title,
         description: lesson.description || '',
         videoUrl: lesson.videoUrl,
-        duration: lesson.duration?.toString() || '',
+        duration: lesson.duration?.toString() || undefined,
         isFreePreview: lesson.isFreePreview,
       })
     } else {
@@ -74,18 +79,20 @@ export function LessonDialog({ open, onOpenChange, onSubmit, lesson, moduleId }:
         title: '',
         description: '',
         videoUrl: '',
-        duration: '',
+        duration: undefined,
         isFreePreview: false,
       })
     }
   }, [lesson, form, open])
 
   const handleSubmit = async (data: LessonFormValues) => {
+    // zodResolver transforms the data, so it's the output type
+    const validatedData = data as unknown as LessonFormOutput
     if (lesson) {
       // Update existing lesson
       const result = await updateLesson(lesson.id, {
-        ...data,
-        duration: data.duration,
+        ...validatedData,
+        duration: validatedData.duration,
       })
       if (result.success) {
         toast.success(result.message)
@@ -97,8 +104,8 @@ export function LessonDialog({ open, onOpenChange, onSubmit, lesson, moduleId }:
     } else {
       // Create new lesson
       onSubmit({
-        ...data,
-        duration: data.duration,
+        ...validatedData,
+        duration: validatedData.duration,
       })
       onOpenChange(false)
     }
@@ -167,8 +174,14 @@ export function LessonDialog({ open, onOpenChange, onSubmit, lesson, moduleId }:
                     <FormControl>
                       <Input
                         type="number"
-                        {...field}
-                        onChange={(e) => field.onChange(e.target.value)}
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          field.onChange(value === '' ? undefined : Number(value))
+                        }}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                        ref={field.ref}
                       />
                     </FormControl>
                     <FormMessage />

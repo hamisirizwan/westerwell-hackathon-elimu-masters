@@ -2,12 +2,12 @@
 
 import dbConnect from '@/db/dbConnect'
 import { Activity } from '@/db/models/ActivityModel'
-import { ActivityType } from '@/lib/enums/activityType'
+import { ActivityTypeValue } from '@/lib/enums/activityType'
 import mongoose from 'mongoose'
 
 interface CreateActivityInput {
   userId: string
-  activityType: ActivityType
+  activityType: ActivityTypeValue
   title: string
   description?: string
   metadata?: Record<string, any>

@@ -21,10 +21,10 @@ export default async function DashboardPage() {
     !isAdmin ? getStudentEnrollments() : Promise.resolve({ success: false, message: 'Not needed' }),
   ])
 
-  const adminStats = adminStatsResult.success && adminStatsResult.data ? adminStatsResult.data : null
-  const studentStats = studentStatsResult.success && studentStatsResult.data ? studentStatsResult.data : null
-  const activities = activitiesResult.success && activitiesResult.data ? activitiesResult.data : []
-  const enrollments = enrollmentsResult.success && enrollmentsResult.data ? enrollmentsResult.data : []
+  const adminStats = adminStatsResult.success && 'data' in adminStatsResult ? adminStatsResult.data : null
+  const studentStats = studentStatsResult.success && 'data' in studentStatsResult ? studentStatsResult.data : null
+  const activities = activitiesResult.success && 'data' in activitiesResult ? activitiesResult.data : []
+  const enrollments = (enrollmentsResult.success && 'data' in enrollmentsResult && enrollmentsResult.data) ? enrollmentsResult.data : []
 
   return (
     <div className="space-y-8">

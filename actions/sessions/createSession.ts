@@ -15,7 +15,7 @@ const CreateSessionSchema = z.object({
   duration: z.number().min(1, 'Duration must be at least 1 minute'),
   meetingLink: z.string().url('Invalid meeting link').optional().or(z.literal('')),
   recordingUrl: z.string().url('Invalid recording URL').optional().or(z.literal('')),
-  order: z.number().min(0, 'Order cannot be negative').default(0),
+  order: z.number().min(0, 'Order cannot be negative').optional(),
 })
 
 export type CreateSessionInput = z.infer<typeof CreateSessionSchema>

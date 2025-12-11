@@ -11,7 +11,7 @@ const CreateModuleSchema = z.object({
   courseId: z.string().min(1, 'Course ID is required'),
   title: z.string().min(1, 'Title is required').max(150, 'Title cannot exceed 150 characters'),
   description: z.string().max(1000, 'Description cannot exceed 1000 characters').optional(),
-  order: z.number().min(0, 'Order cannot be negative').default(0),
+  order: z.number().min(0, 'Order cannot be negative').optional(),
 })
 
 export type CreateModuleInput = z.infer<typeof CreateModuleSchema>

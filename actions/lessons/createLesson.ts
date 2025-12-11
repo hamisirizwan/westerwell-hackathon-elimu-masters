@@ -13,7 +13,7 @@ const CreateLessonSchema = z.object({
   description: z.string().max(1000, 'Description cannot exceed 1000 characters').optional(),
   videoUrl: z.string().url('Invalid video URL').min(1, 'Video URL is required'),
   duration: z.number().min(0, 'Duration cannot be negative').optional(),
-  order: z.number().min(0, 'Order cannot be negative').default(0),
+  order: z.number().min(0, 'Order cannot be negative').optional(),
   isFreePreview: z.boolean().default(false),
 })
 
